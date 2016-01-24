@@ -16,6 +16,7 @@ class MovieEndPointTests(APITestCase):
         data = { 'title': 'Test Movie', 'imdb': 'aa1234567890' }
         original_response = client.post('/api/movies/', data)
         duplicate_response = client.post('/api/movies/', data)
+
         self.assertEqual(original_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(duplicate_response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Movie.objects.get().imdb, 'aa1234567890')
@@ -29,6 +30,8 @@ class MovieEndPointTests(APITestCase):
         client = APIClient()
         client.force_authenticate(user=user)
         response = client.get('/api/movies/')
+
+        self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_deleting_movie(self):
@@ -40,6 +43,8 @@ class MovieEndPointTests(APITestCase):
         client = APIClient()
         client.force_authenticate(user=user)
         response = client.delete('/api/movies/1/')
+
+        self.assertEqual(response.data, None)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_updating_movie(self):
@@ -52,6 +57,7 @@ class MovieEndPointTests(APITestCase):
         client.force_authenticate(user=user)
         data = { 'approved': 'true' }
         response = client.patch('/api/movies/1/', data)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data,
                          {'downloaded': False, 'approved': True, 'id': 1, 'imdb': 'aa1234567890',
