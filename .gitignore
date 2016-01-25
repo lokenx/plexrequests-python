@@ -2,6 +2,7 @@
 .pyc
 db.sqlite3
 __pycache__
+.coverage
 
 .idea/
 dist/
