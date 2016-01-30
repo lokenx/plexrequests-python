@@ -1,5 +1,5 @@
-from config.models import Config
-from config.serializers import ConfigSerializer
+from .models import Config
+from .serializers import ConfigSerializer
 from rest_framework import generics, permissions
 
 class ConfigList(generics.RetrieveUpdateAPIView):

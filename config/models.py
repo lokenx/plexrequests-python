@@ -3,7 +3,8 @@ from django.db import models
 
 class Config(models.Model):
     site_title = models.CharField(max_length=255, default='Plex Requests')
-    site_tagline = models.CharField(max_length=255, default="Want to watch something but it's not currently on Plex? Select an option below and do a quick search!")
+    site_tagline = models.CharField(max_length=255,
+                                    default="Want to watch something but it's not currently on Plex? Select an option below and do a quick search!")
 
     search_movie = models.BooleanField(default=True)
     search_tv = models.BooleanField(default=True)
@@ -15,8 +16,10 @@ class Config(models.Model):
 
     requests_approval = models.BooleanField(default=False)
 
-    singleton_enforce = models.IntegerField(default = 1, unique = True)
+    auth_required = models.BooleanField(default=False)
+    auth_plextoken = models.CharField(max_length=255, default='abcd1234')
 
+    singleton_enforce = models.IntegerField(default=1, unique=True)
 
     def save(self, *args, **kwargs):
         """

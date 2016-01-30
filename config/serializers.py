@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from config.models import Config
+from .models import Config
 
 
 class ConfigSerializer(serializers.ModelSerializer):
