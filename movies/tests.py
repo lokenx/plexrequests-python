@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from .models import Movie
+from config.models import Config
 from django.contrib.auth.models import User
 
 
@@ -10,6 +11,7 @@ class MovieEndPointTests(APITestCase):
         Should insert new movie correctly but not allow
         duplicate movies to be inserted
         """
+        Config.objects.create()
         user = User.objects.create(username='admin')
         client = APIClient()
         client.force_authenticate(user=user)
@@ -63,3 +65,19 @@ class MovieEndPointTests(APITestCase):
                          {'downloaded': False, 'approved': True, 'id': 1, 'imdb': 'aa1234567890',
                           'year': 0, 'pending': True, 'requested_by': 'admin',
                           'title': 'Test Movie', 'poster_path': ''})
+
+    def test_movie_limits(self):
+        """
+        Should fail insert new movie due to limit
+        """
+        Config.objects.create(limit_movie=1, requests_approval=True)
+        user = User.objects.create(username='admin')
+        client = APIClient()
+        client.force_authenticate(user=user)
+        data = { 'title': 'Test Movie', 'imdb': 'aa1234567890' }
+        data_2 = { 'title': 'Test Movie', 'imdb': 'bb1234567890' }
+        first_response = client.post('/api/movies/', data)
+        second_response = client.post('/api/movies/', data_2)
+
+        self.assertEqual(first_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(second_response.status_code, status.HTTP_400_BAD_REQUEST)
