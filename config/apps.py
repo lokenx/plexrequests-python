@@ -1,5 +1,5 @@
-from django.apps import AppConfig
-
-
-class ConfigConfig(AppConfig):
-    name = 'config'
+# from django.apps import AppConfig
+#
+#
+# class ConfigConfig(AppConfig):
+#     name = 'config'
