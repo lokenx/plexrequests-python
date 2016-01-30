@@ -59,16 +59,3 @@ class Config(models.Model):
         """
         self.__class__.objects.exclude(id=self.id).delete()
         super(Config, self).save(*args, **kwargs)
-
-    @classmethod
-    def load(cls):
-        """
-        Load object from the database. Failing that, create a new empty
-        (default) instance of the object and return it (without saving it
-        to the database).
-        """
-
-        try:
-            return cls.objects.get()
-        except cls.DoesNotExist:
-            return cls()
