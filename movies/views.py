@@ -22,10 +22,11 @@ class MovieList(generics.ListCreateAPIView):
         # Also checks limits
         if self.request.user.is_staff | conf.requests_approval == False:
             serializer.save(requested_by=self.request.user, approved=True, pending=False)
-        elif requested_since < conf.limit_movie:
+        elif conf.limit_movie == 0 | requested_since < conf.limit_movie:
             serializer.save(requested_by=self.request.user, approved=False, pending=True)
         else:
-            raise serializers.ValidationError("You've exceeded your weekly limit")
+            content = { 'error': "You've exceeded your weekly limit for movie requests" }
+            raise serializers.ValidationError(content)
 
 
 class MovieDetail(generics.RetrieveUpdateDestroyAPIView):
