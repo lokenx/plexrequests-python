@@ -20,9 +20,9 @@ class MovieList(generics.ListCreateAPIView):
 
         # If you're an admin user or approvals aren't required set to true
         # Also checks limits
-        if self.request.user.is_staff | conf.requests_approval == False:
+        if self.request.user.is_staff or conf.requests_approval == False:
             serializer.save(requested_by=self.request.user, approved=True, pending=False)
-        elif conf.limit_movie == 0 | requested_since < conf.limit_movie:
+        elif conf.limit_movie == 0 or requested_since < conf.limit_movie:
             serializer.save(requested_by=self.request.user, approved=False, pending=True)
         else:
             content = { 'error': "You've exceeded your weekly limit for movie requests" }
