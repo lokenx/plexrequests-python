@@ -15,7 +15,8 @@ def plex_authentication(username, password):
     except User.DoesNotExist:
         # This is where I check against Plex and create account if they're valid
         # Check the user is a valid Plex user
-        base64_auth = base64.b64encode('%s:%s' % (username, password))
+        base64_auth = base64.encodestring(('%s:%s' % (username,password)).encode()).decode().replace('\n', '')
+
         headers = {
             'Authorization': 'Basic ' + base64_auth,
             'X-Plex-Client-Identifier': 'BLS6IF8NV9OX3LHGIG9G63WIGO',
