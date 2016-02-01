@@ -9,12 +9,20 @@ from .models import Config
 
 
 def plex_authentication(username, password):
+    """
+    Handle user login and registrations. Refer to issue #2 (https://github.com/lokenx/plex_requests/issues/2) for
+    logic behind this
+
+    :param username: user supplied username
+    :param password: user supplied password
+    :return: valid user object or None
+    """
     try:
+        # Check if user is an existing user
         user = User.objects.get(username=username)
         is_valid = user.check_password(password)
     except User.DoesNotExist:
-        # This is where I check against Plex and create account if they're valid
-        # Check the user is a valid Plex user
+        # If not an existing user check with Plex
         base64_auth = base64.encodestring(('%s:%s' % (username,password)).encode()).decode().replace('\n', '')
 
         headers = {
@@ -39,35 +47,36 @@ def plex_authentication(username, password):
                     if username == user.get('username'):
                         return User.objects.create_user(username=username, email=email, password=password), None
 
+        # If not a valid user or not on the friends list return None
         return None
 
     if is_valid:
+        # If an existing user confirm password is correct and return user, otherwise None
         return user, None
     else:
         return None
 
 
 class CustomJWTSerializer(JSONWebTokenSerializer):
+    """
+    Custom validation/serialization for getting a JWT token
+    """
     def validate(self, attrs):
         username = attrs.get('username').lower()
         password = attrs.get('password')
 
-        if username and password:
-            user = plex_authentication(username=username, password=password)
+        user = plex_authentication(username=username, password=password)
 
-            if user:
-                if not user[0].is_active:
-                    msg = 'User account is disabled.'
-                    raise serializers.ValidationError(msg)
-
-                payload = jwt_payload_handler(user[0])
-
-                return {
-                    'token': jwt_encode_handler(payload)
-                }
-            else:
-                msg = 'Unable to login with provided credentials.'
+        if user:
+            if not user[0].is_active:
+                msg = 'User account is disabled.'
                 raise serializers.ValidationError(msg)
+
+            payload = jwt_payload_handler(user[0])
+
+            return {
+                'token': jwt_encode_handler(payload)
+            }
         else:
-            msg = 'Must include "username" and "password"'
+            msg = 'Unable to login with provided credentials.'
             raise serializers.ValidationError(msg)
