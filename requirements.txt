@@ -5,4 +5,4 @@ Markdown==2.6.5
 wheel==0.26.0
 codecov==1.6.3
 djangorestframework-jwt==1.7.2
-httmock==1.2.4
+httpretty==0.8.14
