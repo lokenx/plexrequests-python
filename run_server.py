@@ -34,6 +34,8 @@ def main():
             (r'.*', tornado.web.FallbackHandler, dict(fallback=container)),
         ])
 
+    os.system('python manage.py collectstatic -v 0 --clear --noinput --link')
+
     server = tornado.httpserver.HTTPServer(tornado_app)
     server.listen(options.port)
 
