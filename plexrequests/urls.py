@@ -9,8 +9,11 @@ from rest_framework_jwt.views import refresh_jwt_token
 
 
 # Add url root if set by user
-root_url_file = open('plexrequests/root_url.txt', 'r')
-root_url = root_url_file.read();
+try:
+    root_url_file = open('plexrequests/root_url.txt', 'r')
+    root_url = root_url_file.read()
+except:
+    root_url = ''
 
 if not root_url or root_url is ' ':
     app_url = ''
