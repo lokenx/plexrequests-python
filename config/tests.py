@@ -1,8 +1,9 @@
+import httpretty
+
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from .models import Config
 from django.contrib.auth.models import User
-import httpretty
 
 
 class ConfigEndPointTests(APITestCase):
