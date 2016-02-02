@@ -15,7 +15,7 @@ class MovieEndPointTests(APITestCase):
         user = User.objects.create(username='admin')
         client = APIClient()
         client.force_authenticate(user=user)
-        data = {'title': 'Test Movie', 'imdb': 'aa1234567890'}
+        data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'year': '2000'}
         original_response = client.post('/api/movies/', data)
         duplicate_response = client.post('/api/movies/', data)
 
@@ -54,7 +54,7 @@ class MovieEndPointTests(APITestCase):
         Should update an existing movie object
         """
         user = User.objects.create_superuser(username='admin', email='admin@doamin.com', password='secret')
-        Movie.objects.create(title='Test Movie', imdb='aa1234567890', requested_by=user)
+        Movie.objects.create(title='Test Movie', imdb='aa1234567890', year='2000', requested_by=user)
         client = APIClient()
         client.force_authenticate(user=user)
         data = {'approved': 'true'}
@@ -63,7 +63,7 @@ class MovieEndPointTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data,
                          {'downloaded': False, 'approved': True, 'id': 1, 'imdb': 'aa1234567890',
-                          'year': 0, 'pending': True, 'requested_by': 'admin',
+                          'year': 2000, 'pending': True, 'requested_by': 'admin',
                           'title': 'Test Movie', 'poster_path': ''})
 
     def test_movie_limits(self):
@@ -74,8 +74,8 @@ class MovieEndPointTests(APITestCase):
         user = User.objects.create(username='admin')
         client = APIClient()
         client.force_authenticate(user=user)
-        data = {'title': 'Test Movie', 'imdb': 'aa1234567890'}
-        data_2 = {'title': 'Test Movie', 'imdb': 'bb1234567890'}
+        data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'year': '2000'}
+        data_2 = {'title': 'Test Movie', 'imdb': 'bb1234567890', 'year': '2000'}
         first_response = client.post('/api/movies/', data)
         second_response = client.post('/api/movies/', data_2)
 
