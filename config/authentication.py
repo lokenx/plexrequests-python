@@ -1,11 +1,15 @@
 import base64
 import requests
+import logging
 
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_jwt.serializers import JSONWebTokenSerializer, jwt_payload_handler, jwt_encode_handler
 from xml.etree import ElementTree
 from .models import Config
+
+
+logger = logging.getLogger(__name__)
 
 
 def plex_authentication(username, password):
@@ -45,15 +49,18 @@ def plex_authentication(username, password):
                 tree = ElementTree.fromstring(friends_list.text)
                 for user in tree.findall('User'):
                     if username == user.get('username'):
+                        logger.info('A new account was created for {}'.format(username))
                         return User.objects.create_user(username=username, email=email, password=password), None
 
         # If not a valid user or not on the friends list return None
+        logger.warn("The user {} attempted to login, but failed Plex.tv verification or isn't on your friends list".format(username))
         return None
 
     if is_valid:
         # If an existing user confirm password is correct and return user, otherwise None
         return user, None
     else:
+        logger.warn('The user {} attempted to login, but failed password verification'.format(username))
         return None
 
 
@@ -69,6 +76,7 @@ class CustomJWTSerializer(JSONWebTokenSerializer):
 
         if user:
             if not user[0].is_active:
+                logger.warn('The user {} attempted to login, but their account is disabled'.format(username))
                 msg = 'User account is disabled.'
                 raise serializers.ValidationError(msg)
 

@@ -138,3 +138,33 @@ USE_TZ = True
 STATIC_ROOT = os.getcwd() + '/static'
 
 STATIC_URL = '/static/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'file': {
+            'format': '%(levelname)s %(asctime)s %(name)s.%(funcName)s:%(lineno)s- %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'file'
+        },
+    },
+    'loggers': {
+        'movies': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propogate': False
+        },
+        'config': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propogate': False
+        },
+    },
+}

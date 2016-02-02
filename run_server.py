@@ -1,6 +1,6 @@
 import os
+import logging
 
-import signal
 from tornado.options import options, define, parse_command_line
 import tornado.httpserver
 import tornado.ioloop
@@ -39,13 +39,14 @@ def main():
     server = tornado.httpserver.HTTPServer(tornado_app)
     server.listen(options.port)
 
-    print('Server started at http://localhost:{}/{}'.format(options.port, options.root))
+    logger = logging.getLogger(__name__)
+    logger.info('Server started at http://localhost:{}/{}'.format(options.port, options.root))
 
     try:
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
         tornado.ioloop.IOLoop.instance().stop()
-        print('\nServer stopped')
+        logger.info('Server stopped')
 
 
 if __name__ == '__main__':

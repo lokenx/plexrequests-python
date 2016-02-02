@@ -14,3 +14,4 @@ tests/.coverage
 plexrequests/root_url.txt
 htmlcov
 static
+debug.log

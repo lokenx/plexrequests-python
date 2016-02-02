@@ -1,4 +1,9 @@
+import logging
+
 from django.db import models
+
+
+logger = logging.getLogger(__name__)
 
 
 class Config(models.Model):
@@ -57,5 +62,6 @@ class Config(models.Model):
         Save object to the database. Removes all other entries if there
         are any.
         """
+        logger.info('Updated settings')
         self.__class__.objects.exclude(id=self.id).delete()
         super(Config, self).save(*args, **kwargs)
