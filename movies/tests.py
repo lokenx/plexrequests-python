@@ -95,7 +95,7 @@ class MovieEndPointTests(APITestCase):
         httpretty.register_uri(httpretty.GET, "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
                                body=json_body,
                                content_type="application/json",
-                               status=201)
+                               status=200)
 
         Config.objects.create(couchpotato_enabled=True)
         user = User.objects.create(username='admin')
@@ -116,7 +116,7 @@ class MovieEndPointTests(APITestCase):
         httpretty.register_uri(httpretty.GET, "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
                                body=json_body,
                                content_type="application/json",
-                               status=201)
+                               status=200)
 
         Config.objects.create(couchpotato_enabled=True)
         user = User.objects.create(username='admin')
@@ -135,11 +135,12 @@ class MovieEndPointTests(APITestCase):
         """
 
         def timeout_callback(request, uri, headers):
-            return requests.ConnectionError('Connection timed out.')
+            return requests.RequestException('Connection timed out.')
 
         httpretty.register_uri(httpretty.GET,
                                "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
-                               body=timeout_callback)
+                               body='{}',
+                               status=408)
 
         Config.objects.create(couchpotato_enabled=True)
         user = User.objects.create(username='admin')

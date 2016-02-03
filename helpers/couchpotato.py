@@ -19,12 +19,12 @@ def add(imdb):
     try:
         request = requests.get(couch_potato_url, timeout=5)
 
-        if request.json()['success']:
-            return True
+        if request.status_code is 200:
+            return request.json()['success']
         else:
-            return False
+            logger.error('Error connecting to CouchPotato: {}'.format('timeout'))
+            return None
 
     except requests.RequestException as error:
-        logger.error(error)
-        logger.warn('Error connecting to CouchPotato')
+        logger.error('Error connecting to CouchPotato: {}'.format(error))
         return None
