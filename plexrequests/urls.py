@@ -12,10 +12,10 @@ from rest_framework_jwt.views import refresh_jwt_token
 try:
     root_url_file = open('plexrequests/root_url.txt', 'r')
     root_url = root_url_file.read()
-except:
+except IOError:
     root_url = ''
 
-if not root_url or root_url is ' ':
+if len(root_url) is 0:
     app_url = ''
 else:
     app_url = root_url + '/'

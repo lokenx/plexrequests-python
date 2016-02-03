@@ -1,14 +1,13 @@
 import os
 import logging
-
-from tornado.options import options, define, parse_command_line
+import signals
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.wsgi
 
 from django.core.wsgi import get_wsgi_application
-
+from tornado.options import options, define, parse_command_line
 
 define('port', type=int, default=8000)
 define('root', type=str, default=' ')
@@ -25,7 +24,13 @@ def main():
     STATIC_PATH = os.getcwd() + "/static/"
 
     root_url_file = open('plexrequests/root_url.txt', 'w+')
-    root_url_file.write(options.root)
+
+    if len(options.root) is 1:
+        root = ''
+    else:
+        root = options.root
+
+    root_url_file.write(root)
     root_url_file.close()
 
     tornado_app = tornado.web.Application(
@@ -34,7 +39,7 @@ def main():
             (r'.*', tornado.web.FallbackHandler, dict(fallback=container)),
         ])
 
-    os.system('python manage.py collectstatic -v 0 --clear --noinput --link')
+    os.system('python manage.py collectstatic -v 0 --clear --noinput')
 
     server = tornado.httpserver.HTTPServer(tornado_app)
     server.listen(options.port)
