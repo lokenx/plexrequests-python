@@ -134,10 +134,12 @@ class MovieEndPointTests(APITestCase):
         Should fail to add due to a timeout
         """
 
+        def exception_callback(request, uri, headers):
+            raise requests.Timeout('Connection timed out.')
+
         httpretty.register_uri(httpretty.GET,
                                "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
-                               body='{}',
-                               status=408)
+                               body=exception_callback)
 
         Config.objects.create(couchpotato_enabled=True)
         user = User.objects.create(username='admin')
