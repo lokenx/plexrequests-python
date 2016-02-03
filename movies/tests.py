@@ -1,3 +1,7 @@
+import httpretty
+import json
+import requests
+
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 from .models import Movie
@@ -81,3 +85,68 @@ class MovieEndPointTests(APITestCase):
 
         self.assertEqual(first_response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(second_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @httpretty.activate
+    def test_couchpotato_add(self):
+        """
+        Should successfully add a movie to CouchPotato
+        """
+        json_body = json.dumps({'success': True})
+        httpretty.register_uri(httpretty.GET, "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
+                               body=json_body,
+                               content_type="application/json",
+                               status=201)
+
+        Config.objects.create(couchpotato_enabled=True)
+        user = User.objects.create(username='admin')
+        client = APIClient()
+        client.force_authenticate(user=user)
+        data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'year': '2000'}
+        response = client.post('/api/movies/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Movie.objects.get().approved, True)
+
+    @httpretty.activate
+    def test_couchpotato_fail(self):
+        """
+        Should fail to add a movie to CouchPotato
+        """
+        json_body = json.dumps({'success': False})
+        httpretty.register_uri(httpretty.GET, "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
+                               body=json_body,
+                               content_type="application/json",
+                               status=201)
+
+        Config.objects.create(couchpotato_enabled=True)
+        user = User.objects.create(username='admin')
+        client = APIClient()
+        client.force_authenticate(user=user)
+        data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'year': '2000'}
+        response = client.post('/api/movies/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Movie.objects.get().approved, False)
+
+    @httpretty.activate
+    def test_couchpotato_timeout(self):
+        """
+        Should fail to add due to a timeout
+        """
+
+        def timeout_callback(request, uri, headers):
+            return requests.ConnectionError('Connection timed out.')
+
+        httpretty.register_uri(httpretty.GET,
+                               "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
+                               body=timeout_callback)
+
+        Config.objects.create(couchpotato_enabled=True)
+        user = User.objects.create(username='admin')
+        client = APIClient()
+        client.force_authenticate(user=user)
+        data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'year': '2000'}
+        response = client.post('/api/movies/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Movie.objects.get().approved, False)
