@@ -21,7 +21,7 @@ def main():
     wsgi_app = get_wsgi_application()
     container = tornado.wsgi.WSGIContainer(wsgi_app)
 
-    STATIC_PATH = os.getcwd() + "/static/"
+    static_path = os.getcwd() + "/static/"
 
     root_url_file = open('plexrequests/root_url.txt', 'w+')
 
@@ -35,11 +35,13 @@ def main():
 
     tornado_app = tornado.web.Application(
         [
-            (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': STATIC_PATH}),
+            (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': static_path}),
             (r'.*', tornado.web.FallbackHandler, dict(fallback=container)),
         ])
 
+    os.system('python manage.py migrate')
     os.system('python manage.py collectstatic -v 0 --clear --noinput')
+    os.system('python manage.py loaddata default.config.json')
 
     server = tornado.httpserver.HTTPServer(tornado_app)
     server.listen(options.port)
