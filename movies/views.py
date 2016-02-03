@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class MovieList(generics.ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         conf = Config.objects.get()
