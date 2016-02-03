@@ -166,5 +166,10 @@ LOGGING = {
             'level': 'INFO',
             'propogate': False
         },
+        'helpers': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propogate': False
+        },
     },
 }

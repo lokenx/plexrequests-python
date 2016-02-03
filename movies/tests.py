@@ -134,9 +134,6 @@ class MovieEndPointTests(APITestCase):
         Should fail to add due to a timeout
         """
 
-        def timeout_callback(request, uri, headers):
-            return requests.RequestException('Connection timed out.')
-
         httpretty.register_uri(httpretty.GET,
                                "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
                                body='{}',
