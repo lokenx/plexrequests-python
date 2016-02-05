@@ -4,8 +4,9 @@ from django.db import models
 class Movie(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100)
-    year = models.IntegerField(default=0)
-    imdb = models.CharField(max_length=100, unique=True)
+    release_date = models.DateField(null=True)
+    id = models.IntegerField(unique=True, primary_key=True)
+    imdb = models.CharField(max_length=100, blank=True)
     downloaded = models.BooleanField(default=False)
     poster_path = models.CharField(max_length=100, blank=True, default='')
     approved = models.BooleanField(default=False)
