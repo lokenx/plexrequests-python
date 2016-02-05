@@ -81,12 +81,15 @@ class MovieEndPointTests(APITestCase):
         json_body = json.dumps({'imdb_id': 'aa1234567890' })
         httpretty.register_uri(httpretty.GET, 'https://api.themoviedb.org/3/movie/1', body=json_body)
 
+        json_body_2 = json.dumps({'imdb_id': 'bb1234567890' })
+        httpretty.register_uri(httpretty.GET, 'https://api.themoviedb.org/3/movie/2', body=json_body)
+
         Config.objects.create(limit_movie=1, requests_approval=True)
         user = User.objects.create(username='admin')
         client = APIClient()
         client.force_authenticate(user=user)
         data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'release_date': '2000-01-01', 'id': '1'}
-        data_2 = {'title': 'Test Movie', 'imdb': 'bb1234567890', 'release_date': '2000-01-01', 'id': '1'}
+        data_2 = {'title': 'Test Movie', 'imdb': 'bb1234567890', 'release_date': '2000-01-01', 'id': '2'}
         first_response = client.post('/api/movies/', data)
         second_response = client.post('/api/movies/', data_2)
 
@@ -166,3 +169,26 @@ class MovieEndPointTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Movie.objects.get().approved, False)
+
+    @httpretty.activate
+    def test_imdb_id_error(self):
+        """
+        Should fail when there isn't an IMDB ID available for a movie
+        """
+        json_body = json.dumps({'imdb_id': ''})
+        httpretty.register_uri(httpretty.GET, 'https://api.themoviedb.org/3/movie/1', body=json_body)
+
+        json_body_2 = json.dumps({'success': False})
+        httpretty.register_uri(httpretty.GET, "http://192.168.0.1:5050/api/abcd1234/movie.add?identifier=aa1234567890",
+                               body=json_body_2,
+                               content_type="application/json",
+                               status=200)
+
+        Config.objects.create()
+        user = User.objects.create(username='admin')
+        client = APIClient()
+        client.force_authenticate(user=user)
+        data = {'title': 'Test Movie', 'imdb': 'aa1234567890', 'release_date': '2000-01-01', 'id': '1'}
+        response = client.post('/api/movies/', data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
