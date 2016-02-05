@@ -7,3 +7,4 @@ wheel==0.26.0
 codecov==1.6.3
 djangorestframework-jwt==1.7.2
 httpretty==0.8.14
+tmdbsimple==1.3.0

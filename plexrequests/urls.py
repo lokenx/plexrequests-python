@@ -4,6 +4,7 @@ from django.contrib import admin
 from config.authentication import CustomJWTSerializer
 from movies import views as movie_views
 from config import views as config_views
+from search import views as search_views
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework_jwt.views import refresh_jwt_token
 
@@ -21,6 +22,7 @@ else:
     app_url = root_url + '/'
 
 urlpatterns = [
+    url(r'^' + app_url + 'api/search$', search_views.search_request),
     url(r'^' + app_url + 'api/auth/', include('rest_framework.urls')),
     url(r'^' + app_url + 'api/movies/$', movie_views.MovieList.as_view()),
     url(r'^' + app_url + 'api/movies/(?P<pk>[0-9]+)/$', movie_views.MovieDetail.as_view()),

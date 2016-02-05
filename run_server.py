@@ -1,6 +1,5 @@
 import os
 import logging
-import signals
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
